@@ -1,0 +1,31 @@
+stages:
+  - build
+  - push
+
+variables:
+  IMAGE_NAME: "arnsdx/django-pg"
+  TAG: "latest"
+
+build_image:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
+  script:
+    - docker build -t $IMAGE_NAME:$TAG .
+  only:
+    - master
+
+push_image:
+  stage: push
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
+  script:
+    - docker push $IMAGE_NAME:$TAG
+  only:
+    - master
